@@ -191,13 +191,17 @@ nextBtn.onclick = () => {
     noBtn.style.transform = "scale(1)";
   }
 
-  if (texts[index] === "Will you be my Valentine?") {
-    stage = "valentine";
-    yesBtn.style.display = "inline-block";
-    noBtn.style.display = "inline-block";
-    noBtn.style.position = "absolute";
-    valentineHover = 0;
-  }
+ if (texts[index] === "Will you be my Valentine?") {
+  stage = "valentine";
+
+  yesBtn.style.display = "inline-block";
+  noBtn.style.display = "inline-block";
+  nextBtn.style.display = "none"; // 🔴 THIS removes the 3rd button
+
+  noBtn.style.position = "absolute";
+  valentineHover = 0;
+}
+
 };
 
 // ---------- KARAHI YES HOVER ----------
