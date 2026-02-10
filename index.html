@@ -31,6 +31,7 @@
   h1 {
     color: #ff4d6d;
     min-height: 90px;
+    margin: 0;
   }
 
   img {
@@ -38,14 +39,15 @@
     height: 260px;
     object-fit: cover;
     border-radius: 15px;
-    margin: 15px 0;
+    margin: 15px auto 0;
+    display: block;
   }
 
   .button-container {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin-top: 10px;
+    margin-top: 16px;
   }
 
   button {
@@ -66,7 +68,7 @@
 
   #yesBtn,
   #noBtn {
-    display: none;
+    display: none; /* shown via JS when needed */
   }
 
   #noBtn {
@@ -83,7 +85,7 @@
 
   @keyframes floatUp {
     from { transform: translateY(0) scale(1); opacity: 1; }
-    to { transform: translateY(-700px) scale(1.5); opacity: 0; }
+    to   { transform: translateY(-700px) scale(1.5); opacity: 0; }
   }
 </style>
 </head>
@@ -103,7 +105,7 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-// ---------- CONTENT ----------
+/* ---------- CONTENT ---------- */
 const texts = [
   "So there is a special day coming up…",
   "And I was thinking about how lucky I am",
@@ -154,18 +156,14 @@ const karahiNoTexts = [
   "😒"
 ];
 
-
-// ---------- STATE ----------
+/* ---------- STATE ---------- */
 let index = 0;
-let stage = "story";
+let stage = "story";     // "story" | "karahi" | "valentine"
 let karahiHover = 0;
-let valentineHover = 0;
 let canClickYes = false;
 let confettiLoop = null;
-let nextTimeout = null;
 
-
-// ---------- ELEMENTS ----------
+/* ---------- ELEMENTS ---------- */
 const textEl = document.getElementById("text");
 const gifEl = document.getElementById("gif");
 const nextBtn = document.getElementById("nextBtn");
@@ -173,40 +171,65 @@ const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 const container = document.getElementById("container");
 
-// ---------- INIT ----------
+/* ---------- HELPERS ---------- */
+function resetYesNoVisuals() {
+  // Put buttons back into the centered flex row
+  yesBtn.style.position = "static";
+  yesBtn.style.left = "";
+  yesBtn.style.top = "";
+
+  noBtn.style.position = "static";
+  noBtn.style.left = "";
+  noBtn.style.top = "";
+
+  noBtn.style.transform = "scale(1)";
+  yesBtn.textContent = "YES 💖";
+  noBtn.textContent = "NO 😒";
+}
+
+/* ---------- INIT ---------- */
 textEl.textContent = texts[0];
 gifEl.src = gifs[0];
 
-// ---------- NEXT ----------
+/* ---------- NEXT ---------- */
 nextBtn.onclick = () => {
+  if (index >= texts.length - 1) return; // safety
   index++;
+
   textEl.textContent = texts[index];
   gifEl.src = gifs[index];
 
+  // Default view: only Next button
+  stage = "story";
+  yesBtn.style.display = "none";
+  noBtn.style.display = "none";
+  nextBtn.style.display = "inline-block";
+  resetYesNoVisuals();
+
+  // KARAHI STAGE
   if (texts[index].includes("Chicken Karahi")) {
     stage = "karahi";
+    nextBtn.style.display = "none";
     yesBtn.style.display = "inline-block";
     noBtn.style.display = "inline-block";
-    nextBtn.style.display = "none";
+
     karahiHover = 0;
     canClickYes = false;
-    noBtn.style.transform = "scale(1)";
+    resetYesNoVisuals();
   }
 
- if (texts[index] === "Will you be my Valentine?") {
-  stage = "valentine";
+  // VALENTINE STAGE (simple buttons, no movement, no text changes)
+  if (texts[index] === "Will you be my Valentine?") {
+    stage = "valentine";
+    nextBtn.style.display = "none";
+    yesBtn.style.display = "inline-block";
+    noBtn.style.display = "inline-block";
 
-  yesBtn.style.display = "inline-block";
-  noBtn.style.display = "inline-block";
-  nextBtn.style.display = "none"; // 🔴 THIS removes the 3rd button
-
-  noBtn.style.position = "absolute";
-  valentineHover = 0;
-}
-
+    resetYesNoVisuals();
+  }
 };
 
-// ---------- KARAHI YES HOVER ----------
+/* ---------- KARAHI YES HOVER (ONLY when stage === "karahi") ---------- */
 yesBtn.onmouseenter = () => {
   if (stage !== "karahi" || canClickYes) return;
 
@@ -215,32 +238,29 @@ yesBtn.onmouseenter = () => {
   if (karahiHover < 6) {
     const r = container.getBoundingClientRect();
     yesBtn.style.position = "absolute";
-    yesBtn.style.left = Math.random() * (r.width - 120) + "px";
-    yesBtn.style.top = Math.random() * (r.height - 140) + "px";
+    yesBtn.style.left = (Math.random() * (r.width - 120)) + "px";
+    yesBtn.style.top  = (Math.random() * (r.height - 140)) + "px";
   } else {
-    canClickYes = true;
-  }
+  canClickYes = true;
+  // DO NOT reset position — keep it where it last moved
+}
 
   noBtn.style.transform = `scale(${1 + 0.3 * karahiHover})`;
   noBtn.textContent = karahiNoTexts[karahiHover % karahiNoTexts.length];
 };
 
-// ---------- VALENTINE NO ----------
+/* ---------- NO hover does NOTHING for valentine ---------- */
 noBtn.onmouseenter = () => {
-  if (stage !== "valentine") return;
-
-  valentineHover++;
-  const r = container.getBoundingClientRect();
-  noBtn.style.left = Math.random() * (r.width - 120) + "px";
-  noBtn.style.top = Math.random() * (r.height - 140) + "px";
-  noBtn.textContent = valentineNoTexts[valentineHover % valentineNoTexts.length];
+  // Intentionally blank for valentine (and story)
+  // Karahi behavior is already handled by YES hover above.
 };
 
-// ---------- YES CLICK ----------
+/* ---------- YES CLICK ---------- */
 yesBtn.onclick = () => {
-
   // 🍗 KARAHI COMPLETE
-  if (stage === "karahi" && canClickYes) {
+  if (stage === "karahi") {
+    if (!canClickYes) return;
+
     stage = "story";
     yesBtn.style.display = "none";
     noBtn.style.display = "none";
@@ -248,22 +268,22 @@ yesBtn.onclick = () => {
     gifEl.src = "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif";
     textEl.textContent = "FINE... you win 😅";
 
+    // confetti loop
     confettiLoop = setInterval(() => {
       confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
     }, 1200);
 
-  nextTimeout = setTimeout(() => {
-  clearInterval(confettiLoop);
-  nextBtn.style.display = "inline-block";
-}, 5000);
-
+    setTimeout(() => {
+      clearInterval(confettiLoop);
+      nextBtn.style.display = "inline-block";
+      resetYesNoVisuals();
+    }, 5000);
 
     return;
   }
 
-  // 💘 FINAL VALENTINE YES
+  // 💘 VALENTINE YES (hearts)
   if (stage === "valentine") {
-    stage = "valentine";
     yesBtn.style.display = "none";
     noBtn.style.display = "none";
     nextBtn.style.display = "none";
@@ -274,11 +294,16 @@ yesBtn.onclick = () => {
       heart.textContent = Math.random() > 0.5 ? "💖" : "💗";
       heart.style.left = Math.random() * 100 + "%";
       heart.style.bottom = "-20px";
-      heart.style.fontSize = 20 + Math.random() * 25 + "px";
+      heart.style.fontSize = (20 + Math.random() * 25) + "px";
       container.appendChild(heart);
       setTimeout(() => heart.remove(), 6000);
     }, 250);
   }
+};
+
+/* ---------- NO CLICK (does nothing for valentine) ---------- */
+noBtn.onclick = () => {
+  // If you want "NO" to do something on Valentine later, add it here.
 };
 </script>
 </body>
