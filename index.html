@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>For You 💕</title>
+
+<style>
+  body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  .container {
+    width: 500px;
+    height: 520px;
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  h1 {
+    color: #ff4d6d;
+    min-height: 90px;
+  }
+
+  img {
+    width: 260px;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin: 15px 0;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, left 0.2s ease, top 0.2s ease;
+    white-space: nowrap;
+  }
+
+  #nextBtn,
+  #yesBtn {
+    background-color: #ff4d6d;
+    color: white;
+  }
+
+  #yesBtn,
+  #noBtn {
+    display: none;
+  }
+
+  #noBtn {
+    background-color: #adb5bd;
+    transform: scale(1);
+  }
+
+  /* 💕 HEARTS */
+  .heart {
+    position: absolute;
+    animation: floatUp 6s linear forwards;
+    pointer-events: none;
+  }
+
+  @keyframes floatUp {
+    from { transform: translateY(0) scale(1); opacity: 1; }
+    to { transform: translateY(-700px) scale(1.5); opacity: 0; }
+  }
+</style>
+</head>
+
+<body>
+<div class="container" id="container">
+  <h1 id="text"></h1>
+  <img id="gif" src="" alt="gif">
+
+  <div class="button-container">
+    <button id="nextBtn">Next 👉</button>
+    <button id="yesBtn">YES 💖</button>
+    <button id="noBtn">NO 😒</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+// ---------- CONTENT ----------
+const texts = [
+  "So there is a special day coming up…",
+  "And I was thinking about how lucky I am",
+  "Because I have someone really special",
+  "So I wanted to ask you something…",
+  "Will you be...",
+  "a Fatass with me again... For some homemade Chicken Karahi?",
+
+  "On to slightly more important matters...",
+  "So… I’ve been keeping a tiny secret",
+  "It’s not dramatic or anything… just been on my mind a lot.",
+  "Which is funny, because after three years, I’m usually terrible at keeping things from you",
+  "And even though you probably already guessed it…",
+  "I wanted to say",
+  "I pick you today...",
+  "tomorrow...",
+  "and always…",
+  "Will you be my Valentine?"
+];
+
+const gifs = [
+  "https://media.giphy.com/media/26FLdmIp6wJr91JAI/giphy.gif",
+  "https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif",
+  "https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif",
+  "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif",
+  "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",
+  "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+
+  "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+  "https://media.giphy.com/media/xT0xezQGU5xCDJuCPe/giphy.gif",
+  "https://media.giphy.com/media/3o6ZtpxSZbQRRnwCKQ/giphy.gif",
+  "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+  "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
+  "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+  "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
+  "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+  "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",
+  "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"
+];
+
+const karahiNoTexts = [
+  "It's not even good.",
+  "Are you sure?",
+  "Don't do this to me",
+  "It’s so much work",
+  "ONLY if YOU help",
+  "Remeber you hate my cooking!!",
+  "😒"
+];
+
+const valentineNoTexts = [
+  "Are you sure???",
+  "Don't do this to me",
+  "It’s so much work",
+  "ONLY if you help...jk",
+  "No 😒"
+];
+
+// ---------- STATE ----------
+let index = 0;
+let stage = "story";
+let karahiHover = 0;
+let valentineHover = 0;
+let canClickYes = false;
+let confettiLoop = null;
+
+// ---------- ELEMENTS ----------
+const textEl = document.getElementById("text");
+const gifEl = document.getElementById("gif");
+const nextBtn = document.getElementById("nextBtn");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const container = document.getElementById("container");
+
+// ---------- INIT ----------
+textEl.textContent = texts[0];
+gifEl.src = gifs[0];
+
+// ---------- NEXT ----------
+nextBtn.onclick = () => {
+  index++;
+  textEl.textContent = texts[index];
+  gifEl.src = gifs[index];
+
+  if (texts[index].includes("Chicken Karahi")) {
+    stage = "karahi";
+    yesBtn.style.display = "inline-block";
+    noBtn.style.display = "inline-block";
+    nextBtn.style.display = "none";
+    karahiHover = 0;
+    canClickYes = false;
+    noBtn.style.transform = "scale(1)";
+  }
+
+  if (texts[index] === "Will you be my Valentine?") {
+    stage = "valentine";
+    yesBtn.style.display = "inline-block";
+    noBtn.style.display = "inline-block";
+    noBtn.style.position = "absolute";
+    valentineHover = 0;
+  }
+};
+
+// ---------- KARAHI YES HOVER ----------
+yesBtn.onmouseenter = () => {
+  if (stage !== "karahi" || canClickYes) return;
+
+  karahiHover++;
+
+  if (karahiHover < 6) {
+    const r = container.getBoundingClientRect();
+    yesBtn.style.position = "absolute";
+    yesBtn.style.left = Math.random() * (r.width - 120) + "px";
+    yesBtn.style.top = Math.random() * (r.height - 140) + "px";
+  } else {
+    canClickYes = true;
+  }
+
+  noBtn.style.transform = `scale(${1 + 0.3 * karahiHover})`;
+  noBtn.textContent = karahiNoTexts[karahiHover % karahiNoTexts.length];
+};
+
+// ---------- VALENTINE NO ----------
+noBtn.onmouseenter = () => {
+  if (stage !== "valentine") return;
+
+  valentineHover++;
+  const r = container.getBoundingClientRect();
+  noBtn.style.left = Math.random() * (r.width - 120) + "px";
+  noBtn.style.top = Math.random() * (r.height - 140) + "px";
+  noBtn.textContent = valentineNoTexts[valentineHover % valentineNoTexts.length];
+};
+
+// ---------- YES CLICK ----------
+yesBtn.onclick = () => {
+
+  // 🍗 KARAHI COMPLETE
+  if (stage === "karahi" && canClickYes) {
+    stage = "story";
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+
+    gifEl.src = "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif";
+    textEl.textContent = "FINE... you win 😅";
+
+    confettiLoop = setInterval(() => {
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    }, 1200);
+
+    setTimeout(() => {
+      clearInterval(confettiLoop);
+      nextBtn.style.display = "inline-block";
+    }, 6000);
+
+    return;
+  }
+
+  // 💘 FINAL VALENTINE YES
+  if (stage === "valentine") {
+    stage = "end";
+    textEl.textContent = "I knew it 💖";
+    gifEl.src = "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif";
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    nextBtn.style.display = "none";
+
+    setInterval(() => {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = Math.random() > 0.5 ? "💖" : "💗";
+      heart.style.left = Math.random() * 100 + "%";
+      heart.style.bottom = "-20px";
+      heart.style.fontSize = 20 + Math.random() * 25 + "px";
+      container.appendChild(heart);
+      setTimeout(() => heart.remove(), 6000);
+    }, 250);
+  }
+};
+</script>
+</body>
+</html>
