@@ -34,14 +34,16 @@
     margin: 0;
   }
 
-  img {
-    width: 260px;
-    height: 260px;
-    object-fit: cover;
-    border-radius: 15px;
-    margin: 15px auto 0;
-    display: block;
-  }
+ img {
+  max-width: 100%;
+  max-height: 320px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 15px;
+  margin: 15px auto 0;
+  display: block;
+}
 
   .button-container {
     display: flex;
@@ -87,6 +89,13 @@
     from { transform: translateY(0) scale(1); opacity: 1; }
     to   { transform: translateY(-700px) scale(1.5); opacity: 0; }
   }
+#yesBtn {
+  z-index: 10;
+}
+
+#noBtn {
+  z-index: 1;
+}
 </style>
 </head>
 
@@ -134,12 +143,12 @@ const gifs = [
   "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",
   "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
 
-  "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-  "https://media.giphy.com/media/xT0xezQGU5xCDJuCPe/giphy.gif",
-  "https://media.giphy.com/media/3o6ZtpxSZbQRRnwCKQ/giphy.gif",
-  "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+  "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2J0YWI1dXplbTRhdGJtaHhubWJuMml0eWtvbWNrMXI1MzlxNnd5YiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PlgjaVXdwwTcILCLXH/giphy.gif",
+  "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmsxcmE1cTM4aDRkM3NpcHY4OWJwcDd1YzE0ZXA5a2FnaG53a3l2eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/rZQYNXSCsPHS4t8uqv/giphy.gif",
+  "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzVrNWxhdDBhNDNyamEycTV2eXhubng2dXFhZG9zYXRoMWgxNWZ4ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eFcmvMNzZ40FQrVUBx/giphy.gif",
+  "https://media.tenor.com/Q_kGvuVVgUEAAAAM/smiling-alexis.gif",
   "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
-  "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+  "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExejNibnNpZ2t5cGExejNoaXI2MWtvMTZncG0wb3dqNjgzMDN4NGg5MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DANPZFqusHfO/giphy.gif",
   "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
   "https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
   "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",
@@ -238,6 +247,8 @@ yesBtn.onmouseenter = () => {
   if (karahiHover < 6) {
     const r = container.getBoundingClientRect();
     yesBtn.style.position = "absolute";
+ yesBtn.style.zIndex = "10";   // ✅ keeps YES on top
+  noBtn.style.zIndex = "1";     // ✅ keeps NO underneath
     yesBtn.style.left = (Math.random() * (r.width - 120)) + "px";
     yesBtn.style.top  = (Math.random() * (r.height - 140)) + "px";
   } else {
@@ -265,7 +276,7 @@ yesBtn.onclick = () => {
     yesBtn.style.display = "none";
     noBtn.style.display = "none";
 
-    gifEl.src = "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif";
+    gifEl.src = "https://i.giphy.com/4FTCsLuQUIUapAdIVx.webp";
     textEl.textContent = "FINE... you win 😅";
 
     // confetti loop
