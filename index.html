@@ -162,6 +162,8 @@ let karahiHover = 0;
 let valentineHover = 0;
 let canClickYes = false;
 let confettiLoop = null;
+let nextTimeout = null;
+
 
 // ---------- ELEMENTS ----------
 const textEl = document.getElementById("text");
@@ -250,10 +252,11 @@ yesBtn.onclick = () => {
       confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
     }, 1200);
 
-    setTimeout(() => {
-      clearInterval(confettiLoop);
-      nextBtn.style.display = "inline-block";
-    }, 6000);
+  nextTimeout = setTimeout(() => {
+  clearInterval(confettiLoop);
+  nextBtn.style.display = "inline-block";
+}, 5000);
+
 
     return;
   }
